@@ -3,6 +3,7 @@ import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import { Calendar, ChevronDown, ChevronRight, Clock, Grid, Map as MapIcon, MapPin, Search, Share2, TrendingUp, X } from 'lucide-react';
 import { useEffect, useMemo, useRef, useState } from 'react';
+
 import Map from '../components/Map';
 
 // --- Leaflet marker icon fix ---
@@ -549,14 +550,7 @@ type CultureType = typeof culturalHighlights[0] & { id: number; cardType: "cultu
 type HistoricalType = typeof historicalPlaces[0] & { cardType: "historical"; lat?: number; lng?: number; location?: string; description?: string; era?: string };
 type CardType = (typeof festivalsData[0] & { cardType: "festival" }) | CultureType | HistoricalType;
 
-// --- Map FlyTo function ---
-const FlyToLocation = ({ position }: { position: [number, number] | null }) => {
-  const map = useMap();
-  useEffect(() => {
-    if (position) map.flyTo(position, 6);
-  }, [position, map]);
-return null;
-};
+
 
 const NextMonthHighlight = ({ festivalsData }: { festivalsData: FestivalDataType }) => {
   const nextMonthName = getNextMonthName();
@@ -614,7 +608,8 @@ const Festivals = () => {
   const [showMore, setShowMore] = useState(false);
   const [showMap, setShowMap] = useState(false);
   const [selectedCard, setSelectedCard] = useState<CardType | null>(null);
-  const [showLiveLocation] = useState(false);
+  const [showLiveLocation, setShowLiveLocation] = useState(false);
+
   const [isFilterOpen, setIsFilterOpen] = useState(false); // For the unified button dropdown
   const cardsSectionRef = useRef<HTMLDivElement | null>(null);
 
@@ -657,7 +652,7 @@ const Festivals = () => {
   }, [filterType, searchText, selectedMonth, upcomingFilter, allCards]);
 
   const showCards = showMore ? filteredCards : filteredCards.slice(0, 6);
-  const highlightedCard = selectedCard || filteredCards[0];
+  // const highlightedCard = selectedCard || filteredCards[0];
 
   useEffect(() => { setSelectedCard(null); }, [showMap, filterType]);
 
@@ -869,8 +864,7 @@ const Festivals = () => {
                     transition={{ delay: idx * 0.05 }}
                     key={card.id || card.name}
                     className="bg-white rounded-2xl shadow-sm border border-stone-100 overflow-hidden hover:shadow-xl transition-all duration-300 group cursor-pointer flex flex-col h-full"
-                    onMouseEnter={() => card.id && setHoveredCardId(card.id)}
-                    onMouseLeave={() => setHoveredCardId(null)}
+                    // onMouseEnter and onMouseLeave for hover effect removed (setHoveredCardId was unused)
                     onClick={() => setSelectedCard(card)}
                   >
                     <div className="relative h-56 overflow-hidden">

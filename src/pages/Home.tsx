@@ -31,21 +31,7 @@ L.Icon.Default.mergeOptions({
   shadowUrl: markerShadow,
 });
 
-const _indiaPins: { city: string; note: string; position: [number, number] }[] = [
-  { city: 'Delhi', note: 'Capital · Heritage walks', position: [28.6139, 77.209] },
-  { city: 'Lucknow', note: 'Kebabs · Tehzeeb', position: [26.8467, 80.9462] },
-  { city: 'Varanasi', note: 'Ghats · Aarti', position: [25.3176, 82.9739] },
-  { city: 'Ayodhya', note: 'Ram Janmabhoomi', position: [26.7999, 82.2043] },
-  { city: 'Mumbai', note: 'Sea link · Film city', position: [19.076, 72.8777] },
-  { city: 'Goa', note: 'Beaches · Cafés', position: [15.2993, 74.124] },
-  { city: 'Hyderabad', note: 'Biryani · Charminar', position: [17.385, 78.4867] },
-  { city: 'Bengaluru', note: 'Tech · Coffee', position: [12.9716, 77.5946] },
-  { city: 'Kochi', note: 'Backwaters · Fort', position: [9.9312, 76.2673] },
-  { city: 'Kolkata', note: 'Trams · Mishti', position: [22.5726, 88.3639] },
-  { city: 'Chhattisgarh', note: 'Waterfalls · Forests', position: [21.2787, 81.8661] },
-  { city: 'Jaipur', note: 'Palaces · Bazaars', position: [26.9124, 75.7873] },
-  { city: 'Leh', note: 'Mountains · Monasteries', position: [34.1526, 77.577] },
-];
+
 
 const destinations = [
   {
