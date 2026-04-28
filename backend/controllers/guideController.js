@@ -20,6 +20,114 @@ exports.getGuides = async (req, res) => {
   }
 };
 
+// Get guides with advanced filtering
+exports.getGuidesFiltered = async (req, res) => {
+  try {
+    const { location, specialty, language, minRating, maxPrice, sortBy } = req.query;
+
+    let query = {};
+
+    // Location filter
+    if (location) {
+      query.location = { $regex: location, $options: 'i' };
+    }
+
+    // Specialty filter
+    if (specialty) {
+      query.specialties = { $in: [specialty] };
+    }
+
+    // Language filter
+    if (language) {
+      query.languages = { $in: [language] };
+    }
+
+    // Rating filter
+    if (minRating) {
+      query.rating = { $gte: parseFloat(minRating) };
+    }
+
+    // Price filter
+    if (maxPrice) {
+      query.pricePerDay = { $lte: parseInt(maxPrice) };
+    }
+
+    // Determine sort order
+    let sortOption = { rating: -1 };
+    if (sortBy === 'price-low') {
+      sortOption = { pricePerDay: 1 };
+    } else if (sortBy === 'price-high') {
+      sortOption = { pricePerDay: -1 };
+    } else if (sortBy === 'reviews') {
+      sortOption = { reviews: -1 };
+    }
+
+    const guides = await LocalGuide.find(query).sort(sortOption).limit(50);
+    
+    res.json({
+      success: true,
+      count: guides.length,
+      guides: guides,
+    });
+  } catch (error) {
+    res.status(500).json({ 
+      success: false,
+      message: 'Failed to fetch guides', 
+      error: error.message 
+    });
+  }
+};
+
+// Get guides by location
+exports.getGuidesByLocation = async (req, res) => {
+  try {
+    const { location } = req.query;
+
+    if (!location) {
+      return res.status(400).json({ 
+        success: false,
+        message: 'Location is required' 
+      });
+    }
+
+    const guides = await LocalGuide.find({
+      location: { $regex: location, $options: 'i' }
+    }).sort({ rating: -1 });
+
+    res.json({
+      success: true,
+      count: guides.length,
+      guides: guides,
+    });
+  } catch (error) {
+    res.status(500).json({ 
+      success: false,
+      message: 'Failed to fetch guides', 
+      error: error.message 
+    });
+  }
+};
+
+// Get featured guides
+exports.getFeaturedGuides = async (req, res) => {
+  try {
+    const guides = await LocalGuide.find({ verified: true })
+      .sort({ rating: -1, reviews: -1 })
+      .limit(6);
+
+    res.json({
+      success: true,
+      guides: guides,
+    });
+  } catch (error) {
+    res.status(500).json({ 
+      success: false,
+      message: 'Failed to fetch featured guides', 
+      error: error.message 
+    });
+  }
+};
+
 // Get guide by ID
 exports.getGuideById = async (req, res) => {
   try {

@@ -1,0 +1,12 @@
+// Add this to your project if not present:
+// npm install react-leaflet leaflet
+
+// Usage example (e.g. in App.tsx or a page):
+// import LeafletUserMap from './components/LeafletUserMap';
+// <LeafletUserMap />
+
+// Make sure to import 'leaflet/dist/leaflet.css' in your main entry (e.g. index.tsx)
+
+// If you want a button to trigger location fetch, move the geolocation logic into a handler and call it on button click.
+
+// This map will show the user's current location with a marker and center the map on it. If location is denied, an error message will show.

@@ -70,7 +70,7 @@ const App: React.FC = () => {
 
           {/* Page Content */}
           <main className="flex-grow pt-20 sm:pt-24">
-          <Routes>
+            <Routes>
             {/* Public Routes */}
             <Route path="/" element={<Home />} />
             <Route path="/login" element={<GuestOnly><Login /></GuestOnly>} />

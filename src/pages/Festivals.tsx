@@ -4,7 +4,7 @@ import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import { Calendar, ChevronDown, ChevronRight, Clock, Download, Grid, Map as MapIcon, MapPin, Search, Share2, TrendingUp, X } from 'lucide-react';
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { MapContainer, Marker, Popup, TileLayer, useMap } from 'react-leaflet';
+import Map from '../components/Map';
 
 // --- Leaflet marker icon fix ---
 const DefaultIcon = new L.Icon({
@@ -989,59 +989,7 @@ const Festivals = () => {
             animate={{ opacity: 1, scale: 1 }}
             className="w-full h-[600px] rounded-3xl flex flex-col border border-stone-200 overflow-hidden shadow-2xl relative"
           >
-            <MapContainer
-              center={initialMapCenter}
-              zoom={5}
-              scrollWheelZoom
-              style={{ flexGrow: 1, zIndex: 1 }}
-              ref={mapRef}
-            >
-              <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-                attribution='&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
-              />
-              {filteredCards
-                .filter(card => card.lat !== undefined && card.lng !== undefined)
-                .map(card => (
-                  <Marker
-                    key={card.id}
-                    position={[card.lat!, card.lng!]}
-                    opacity={hoveredCardId === card.id ? 1.0 : 0.8}
-                    eventHandlers={{
-                      mouseover: () => card.id && setHoveredCardId(card.id),
-                      mouseout: () => setHoveredCardId(null),
-                      click: () => setSelectedCard(card)
-                    }}
-                  >
-                    <Popup>
-                      <div className="font-sans p-1">
-                        <h3 className="font-bold text-stone-900 mb-1">{card.name}</h3>
-                        <p className="text-xs text-stone-500 mb-2">
-                          {(card.cardType === 'festival' || card.cardType === 'historical') && 'location' in card 
-                            ? card.location 
-                            : ""}
-                        </p>
-                        <button 
-                          onClick={() => setSelectedCard(card)}
-                          className="text-xs bg-stone-900 text-white px-2 py-1 rounded hover:bg-stone-700 w-full"
-                        >
-                          View Details
-                        </button>
-                      </div>
-                    </Popup>
-                  </Marker>
-                ))}
-              {/* Only fly to on SELECT, not hover */}
-              {selectedCard && 'lat' in selectedCard && 'lng' in selectedCard && selectedCard.lat && selectedCard.lng && (
-                <FlyToLocation position={[selectedCard.lat, selectedCard.lng]} />
-              )}
-              {showLiveLocation && <LiveLocationMarker />}
-            </MapContainer>
-            
-            <div className="absolute bottom-6 left-6 z-[400]">
-              <button onClick={handleDownloadMap} className="px-4 py-2 bg-white text-stone-800 rounded-lg shadow-lg font-medium text-sm flex items-center gap-2 hover:bg-stone-50">
-                <Download size={16} /> Download Map
-              </button>
-            </div>
+            <Map location="India" />
           </motion.div>
         )}
       </div>

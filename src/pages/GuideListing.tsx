@@ -1,19 +1,21 @@
 import { useState, useEffect } from 'react';
-import { Search, MapPin, Star, Loader, AlertCircle } from 'lucide-react';
+import { Search, MapPin, Star, Loader, AlertCircle, Mail, Phone } from 'lucide-react';
 import GuideCard from '../components/GuideCard';
 
 interface Guide {
   _id: string;
   name: string;
   location: string;
-  specialization: string[];
+  specialties: string[];
   languages: string[];
   rating: number;
-  totalReviews: number;
+  reviews: number;
   pricePerDay: number;
   bio: string;
   profileImage: string;
   verified: boolean;
+  email?: string;
+  phone?: string;
 }
 
 const GuideListing = () => {
@@ -27,6 +29,9 @@ const GuideListing = () => {
   const [minRating, setMinRating] = useState<number>(0);
   const [sortBy, setSortBy] = useState<'rating' | 'price' | 'reviews'>('rating');
   const [selectedGuide, setSelectedGuide] = useState<Guide | null>(null);
+  const [contactMessage, setContactMessage] = useState('');
+  const [contactLoading, setContactLoading] = useState(false);
+  const [contactSuccess, setContactSuccess] = useState(false);
 
   useEffect(() => {
     fetchGuides();
@@ -40,17 +45,21 @@ const GuideListing = () => {
     try {
       setLoading(true);
       const baseUrl = import.meta.env.VITE_BACKEND_URL || 'http://localhost:3001';
-      const response = await fetch(`${baseUrl}/api/guides/by-location?location=`, {
+      const response = await fetch(`${baseUrl}/api/local-guides`, {
         headers: {
           'Authorization': `Bearer ${localStorage.getItem('token')}`
         }
       });
       const data = await response.json();
-      if (data.success) {
-        setGuides(data.guides || []);
-      }
+      
+      // Handle both array and object responses
+      const guideList = Array.isArray(data) ? data : (data.guides || []);
+      setGuides(guideList);
+      setError('');
     } catch (err) {
-      setError('Failed to fetch guides');
+      console.error('Error fetching guides:', err);
+      setError('Failed to fetch guides. Please try again.');
+      setGuides([]);
     } finally {
       setLoading(false);
     }
@@ -61,35 +70,62 @@ const GuideListing = () => {
 
     if (searchLocation.trim()) {
       filtered = filtered.filter(guide =>
-        guide.location.toLowerCase().includes(searchLocation.toLowerCase())
+        guide.location?.toLowerCase().includes(searchLocation.toLowerCase())
       );
     }
 
     if (selectedSpecialization) {
       filtered = filtered.filter(guide =>
-        guide.specialization.includes(selectedSpecialization)
+        guide.specialties?.includes(selectedSpecialization)
       );
     }
 
     // Price filter
-    filtered = filtered.filter(guide => guide.pricePerDay <= maxPrice);
+    filtered = filtered.filter(guide => (guide.pricePerDay || 0) <= maxPrice);
 
     // Rating filter
-    filtered = filtered.filter(guide => guide.rating >= minRating);
+    filtered = filtered.filter(guide => (guide.rating || 0) >= minRating);
 
     // Sorting
     if (sortBy === 'rating') {
-      filtered.sort((a, b) => b.rating - a.rating);
+      filtered.sort((a, b) => (b.rating || 0) - (a.rating || 0));
     } else if (sortBy === 'price') {
-      filtered.sort((a, b) => a.pricePerDay - b.pricePerDay);
+      filtered.sort((a, b) => (a.pricePerDay || 0) - (b.pricePerDay || 0));
     } else if (sortBy === 'reviews') {
-      filtered.sort((a, b) => b.totalReviews - a.totalReviews);
+      filtered.sort((a, b) => (b.reviews || 0) - (a.reviews || 0));
     }
 
     setFilteredGuides(filtered);
   };
 
-  const specializations = ['historical', 'adventure', 'cultural', 'nature', 'religious', 'food', 'other'];
+  const handleContactGuide = async () => {
+    if (!selectedGuide || !contactMessage.trim()) {
+      alert('Please enter a message');
+      return;
+    }
+
+    setContactLoading(true);
+    try {
+      // Simulate sending message - in production, this would call your API
+      await new Promise(resolve => setTimeout(resolve, 1500));
+      
+      setContactSuccess(true);
+      setContactMessage('');
+      
+      // Reset success message after 3 seconds and close modal
+      setTimeout(() => {
+        setContactSuccess(false);
+        setSelectedGuide(null);
+      }, 3000);
+    } catch (error) {
+      console.error('Error sending message:', error);
+      alert('Failed to send message. Please try again.');
+    } finally {
+      setContactLoading(false);
+    }
+  };
+
+  const specializations = ['Heritage', 'Monuments', 'History', 'Spiritual', 'Photography', 'Cultural', 'Palace Tours', 'Shopping', 'Beach', 'Adventure', 'Nightlife', 'Culinary', 'Backwaters', 'Nature', 'Houseboat', 'Old Delhi', 'Markets', 'Biryani Tours'];
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-purple-50 to-pink-100 py-12 px-4">
@@ -225,7 +261,7 @@ const GuideListing = () => {
                   </div>
                   <div className="flex items-center gap-2">
                     <Star size={20} className="text-yellow-500" />
-                    <span className="text-lg font-semibold">{selectedGuide.rating.toFixed(1)} ({selectedGuide.totalReviews} reviews)</span>
+                    <span className="text-lg font-semibold">{selectedGuide.rating.toFixed(1)} ({selectedGuide.reviews} reviews)</span>
                   </div>
                   <div className="flex items-center gap-2">
                     <span className="text-2xl">${selectedGuide.pricePerDay}</span>
@@ -242,7 +278,7 @@ const GuideListing = () => {
                   <div>
                     <h3 className="font-semibold text-gray-900 mb-2">Specializations</h3>
                     <div className="flex flex-wrap gap-2">
-                      {selectedGuide.specialization.map(spec => (
+                      {selectedGuide.specialties.map(spec => (
                         <span key={spec} className="bg-blue-100 text-blue-700 px-3 py-1 rounded-full text-sm capitalize">
                           {spec}
                         </span>
@@ -266,13 +302,49 @@ const GuideListing = () => {
                     className="w-full bg-purple-600 hover:bg-purple-700 text-white font-semibold py-3 rounded-lg transition-colors"
                     onClick={() => setSelectedGuide(null)}
                   >
-                    Book This Guide
+                    Close
                   </button>
+                </div>
+
+                {/* Contact Form */}
+                <div className="mt-6 border-t pt-6">
+                  <h3 className="text-lg font-semibold text-gray-900 mb-4">Contact This Guide</h3>
+                  
+                  <div className="space-y-2 mb-4 text-sm">
+                    <div className="flex items-center gap-2">
+                      <Mail size={16} className="text-blue-600" />
+                      <span className="text-gray-700">{selectedGuide.email}</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <Phone size={16} className="text-blue-600" />
+                      <span className="text-gray-700">{selectedGuide.phone}</span>
+                    </div>
+                  </div>
+
+                  <textarea
+                    value={contactMessage}
+                    onChange={(e) => setContactMessage(e.target.value)}
+                    placeholder="Tell the guide about your travel plans..."
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 mb-4"
+                    rows={4}
+                  />
+                  
+                  {contactSuccess && (
+                    <div className="mb-4 p-3 bg-green-100 text-green-700 rounded-lg">
+                      Message sent successfully! The guide will contact you soon.
+                    </div>
+                  )}
+
                   <button
-                    className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 rounded-lg transition-colors"
-                    onClick={() => alert('Contact feature coming soon!')}
+                    className={`w-full text-white font-semibold py-3 rounded-lg transition-colors ${
+                      contactLoading 
+                        ? 'bg-blue-400 cursor-not-allowed' 
+                        : 'bg-blue-600 hover:bg-blue-700'
+                    }`}
+                    onClick={handleContactGuide}
+                    disabled={contactLoading || !contactMessage.trim()}
                   >
-                    Contact Guide
+                    {contactLoading ? 'Sending...' : 'Send Message'}
                   </button>
                 </div>
               </div>

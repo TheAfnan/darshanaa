@@ -1,4 +1,4 @@
-import mongoose from 'mongoose';
+const mongoose = require('mongoose');
 
 const localGuideSchema = new mongoose.Schema({
   name: {
@@ -29,6 +29,10 @@ const localGuideSchema = new mongoose.Schema({
   profileImage: String,
   bio: String,
   languages: [String],
+  pricePerDay: {
+    type: Number,
+    default: 500,
+  },
   verified: {
     type: Boolean,
     default: false,
@@ -39,4 +43,4 @@ const localGuideSchema = new mongoose.Schema({
   },
 });
 
-export default mongoose.model('LocalGuide', localGuideSchema);
+module.exports = mongoose.model('LocalGuide', localGuideSchema);

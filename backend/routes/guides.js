@@ -4,6 +4,15 @@ const router = express.Router();
 const guideController = require('../controllers/guideController');
 const auth = require('../middleware/auth');
 
+// Get featured guides (top 6)
+router.get('/featured', guideController.getFeaturedGuides);
+
+// Get guides with advanced filtering
+router.get('/filtered', guideController.getGuidesFiltered);
+
+// Get guides by location
+router.get('/by-location', guideController.getGuidesByLocation);
+
 // Get all guides (public)
 router.get('/', guideController.getGuides);
 

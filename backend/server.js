@@ -2,6 +2,7 @@ const express = require('express');
 const cors = require('cors');
 const dotenv = require('dotenv');
 const connectDB = require('./config/database');
+const seedGuides = require('./seeds/seedGuides');
 const questionRoutes = require('./routes/questions');
 const chatRoutes = require('./routes/chat');
 const authRoutes = require('./routes/auth');
@@ -39,8 +40,14 @@ app.options('*', cors());
 app.use(express.json());
 app.use('/uploads', express.static('uploads'));
 
-// Connect to MongoDB
-connectDB();
+// Connect to MongoDB and seed data
+connectDB().then(async () => {
+  try {
+    await seedGuides();
+  } catch (error) {
+    console.error('Error seeding guides:', error);
+  }
+});
 
 // Routes
 app.use('/api/auth', authRoutes);

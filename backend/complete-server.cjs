@@ -628,18 +628,238 @@ app.get('/api/routes/cities', (req, res) => {
 });
 
 // ═══════════════════════════════════════════════════════════════════
-// HEALTH CHECK
+// LOCAL GUIDES DATA
 // ═══════════════════════════════════════════════════════════════════
-app.get('/api/health', (req, res) => {
-  res.json({ 
-    status: 'OK',
-    message: 'DarShana Travel API is running! 🚀',
-    endpoints: {
-      auth: ['/api/auth/signup', '/api/auth/login', '/api/auth/me', '/api/auth/update-profile'],
-      festivals: ['/api/festivals/alerts'],
-      routes: ['/api/routes', '/api/routes/cities']
-    }
+const guidesData = [
+  {
+    _id: '1',
+    name: 'Rajesh Kumar',
+    email: 'rajesh.guide@example.com',
+    phone: '+91-9876543210',
+    location: 'Agra',
+    specialties: ['Heritage', 'Monuments', 'History'],
+    rating: 4.8,
+    reviews: 45,
+    profileImage: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=400&fit=crop',
+    bio: 'Certified guide with 10+ years experience in Agra monuments. Expert in Taj Mahal history.',
+    languages: ['English', 'Hindi', 'Spanish'],
+    pricePerDay: 300,
+    verified: true,
+  },
+  {
+    _id: '2',
+    name: 'Lakshmi Sharma',
+    email: 'lakshmi.guide@example.com',
+    phone: '+91-9876543211',
+    location: 'Varanasi',
+    specialties: ['Spiritual', 'Photography', 'Cultural'],
+    rating: 4.6,
+    reviews: 38,
+    profileImage: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=400&h=400&fit=crop',
+    bio: 'Expert in Varanasi spirituality and Ghats. Photographer friendly tours.',
+    languages: ['English', 'Hindi', 'French'],
+    pricePerDay: 250,
+    verified: true,
+  },
+  {
+    _id: '3',
+    name: 'Arjun Singh',
+    email: 'arjun.guide@example.com',
+    phone: '+91-9876543212',
+    location: 'Jaipur',
+    specialties: ['Palace Tours', 'Shopping', 'Heritage'],
+    rating: 4.7,
+    reviews: 52,
+    profileImage: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=400&h=400&fit=crop',
+    bio: 'Local Jaipur expert with deep knowledge of Pink City bazaars and palaces.',
+    languages: ['English', 'Hindi', 'German'],
+    pricePerDay: 280,
+    verified: true,
+  },
+  {
+    _id: '4',
+    name: 'Priya Desai',
+    email: 'priya.guide@example.com',
+    phone: '+91-9876543213',
+    location: 'Goa',
+    specialties: ['Beach', 'Adventure', 'Nightlife'],
+    rating: 4.5,
+    reviews: 61,
+    profileImage: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=400&h=400&fit=crop',
+    bio: 'Beach and adventure enthusiast. Perfect for backpackers and adventure seekers.',
+    languages: ['English', 'Hindi', 'Portuguese'],
+    pricePerDay: 200,
+    verified: true,
+  },
+  {
+    _id: '5',
+    name: 'Vikram Patel',
+    email: 'vikram.guide@example.com',
+    phone: '+91-9876543214',
+    location: 'Lucknow',
+    specialties: ['Culinary', 'Heritage', 'History'],
+    rating: 4.9,
+    reviews: 43,
+    profileImage: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=400&fit=crop',
+    bio: 'Lucknow food and heritage expert. Master guide for authentic Awadhi experience.',
+    languages: ['English', 'Hindi', 'Urdu'],
+    pricePerDay: 270,
+    verified: true,
+  },
+  {
+    _id: '6',
+    name: 'Anjali Nair',
+    email: 'anjali.guide@example.com',
+    phone: '+91-9876543215',
+    location: 'Kochi',
+    specialties: ['Backwaters', 'Nature', 'Houseboat'],
+    rating: 4.4,
+    reviews: 35,
+    profileImage: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=400&h=400&fit=crop',
+    bio: 'Kerala backwater specialist. Expert in houseboat tours and nature walks.',
+    languages: ['English', 'Hindi', 'Malayalam'],
+    pricePerDay: 220,
+    verified: true,
+  },
+  {
+    _id: '7',
+    name: 'Sanjay Gupta',
+    email: 'sanjay.guide@example.com',
+    phone: '+91-9876543216',
+    location: 'Delhi',
+    specialties: ['Old Delhi', 'Markets', 'History'],
+    rating: 4.6,
+    reviews: 48,
+    profileImage: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=400&fit=crop',
+    bio: 'Delhi street food and Old Delhi expert. Perfect walking tour guide.',
+    languages: ['English', 'Hindi'],
+    pricePerDay: 240,
+    verified: true,
+  },
+  {
+    _id: '8',
+    name: 'Supriya Rao',
+    email: 'supriya.guide@example.com',
+    phone: '+91-9876543217',
+    location: 'Hyderabad',
+    specialties: ['Biryani Tours', 'Heritage', 'Shopping'],
+    rating: 4.7,
+    reviews: 40,
+    profileImage: 'https://images.unsplash.com/photo-1504384308090-c894fdcc538d?w=400&h=400&fit=crop',
+    bio: 'Hyderabad food and culture expert. Biryani specialist and heritage guide.',
+    languages: ['English', 'Hindi', 'Telugu'],
+    pricePerDay: 260,
+    verified: true,
+  },
+];
+
+// ═══════════════════════════════════════════════════════════════════
+// LOCAL GUIDES ROUTES
+// ═══════════════════════════════════════════════════════════════════
+
+// GET /api/local-guides - Get all guides
+app.get('/api/local-guides', (req, res) => {
+  const { location } = req.query;
+  
+  let guides = guidesData;
+  
+  if (location) {
+    guides = guides.filter(g => g.location.toLowerCase().includes(location.toLowerCase()));
+  }
+  
+  guides.sort((a, b) => b.rating - a.rating);
+  
+  res.json(guides);
+});
+
+// GET /api/local-guides/featured - Get top 6 guides
+app.get('/api/local-guides/featured', (req, res) => {
+  const featured = guidesData
+    .sort((a, b) => b.rating - a.rating)
+    .slice(0, 6);
+  
+  res.json({
+    success: true,
+    guides: featured
   });
+});
+
+// GET /api/local-guides/by-location - Get guides by location
+app.get('/api/local-guides/by-location', (req, res) => {
+  const { location } = req.query;
+  
+  if (!location) {
+    return res.status(400).json({ 
+      success: false,
+      message: 'Location is required' 
+    });
+  }
+  
+  const guides = guidesData.filter(g => 
+    g.location.toLowerCase().includes(location.toLowerCase())
+  );
+  
+  res.json({
+    success: true,
+    count: guides.length,
+    guides: guides
+  });
+});
+
+// GET /api/local-guides/filtered - Get guides with advanced filtering
+app.get('/api/local-guides/filtered', (req, res) => {
+  const { location, specialty, language, minRating, maxPrice, sortBy } = req.query;
+  
+  let guides = guidesData;
+  
+  if (location) {
+    guides = guides.filter(g => g.location.toLowerCase().includes(location.toLowerCase()));
+  }
+  
+  if (specialty) {
+    guides = guides.filter(g => g.specialties.includes(specialty));
+  }
+  
+  if (language) {
+    guides = guides.filter(g => g.languages.includes(language));
+  }
+  
+  if (minRating) {
+    guides = guides.filter(g => g.rating >= parseFloat(minRating));
+  }
+  
+  if (maxPrice) {
+    guides = guides.filter(g => g.pricePerDay <= parseInt(maxPrice));
+  }
+  
+  // Sort
+  if (sortBy === 'price-low') {
+    guides.sort((a, b) => a.pricePerDay - b.pricePerDay);
+  } else if (sortBy === 'price-high') {
+    guides.sort((a, b) => b.pricePerDay - a.pricePerDay);
+  } else if (sortBy === 'reviews') {
+    guides.sort((a, b) => b.reviews - a.reviews);
+  } else {
+    guides.sort((a, b) => b.rating - a.rating);
+  }
+  
+  res.json({
+    success: true,
+    count: guides.length,
+    guides: guides
+  });
+});
+
+// GET /api/local-guides/:guideId - Get single guide
+app.get('/api/local-guides/:guideId', (req, res) => {
+  const { guideId } = req.params;
+  const guide = guidesData.find(g => g._id === guideId);
+  
+  if (!guide) {
+    return res.status(404).json({ message: 'Guide not found' });
+  }
+  
+  res.json(guide);
 });
 
 // ═══════════════════════════════════════════════════════════════════

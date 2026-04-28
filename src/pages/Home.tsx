@@ -16,7 +16,7 @@ import {
   Train,
 } from 'lucide-react';
 import React from 'react';
-import { MapContainer, Marker, Popup, TileLayer } from 'react-leaflet';
+import Map from '../components/Map';
 import { Link } from 'react-router-dom';
 
 import FamousFood from '../components/FamousFood';
@@ -174,26 +174,7 @@ const Home: React.FC = () => {
           <div className="relative overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-[0_25px_50px_-25px_rgba(0,0,0,0.25)] p-3" style={{ perspective: '1400px' }}>
             <div className="absolute inset-0 bg-gradient-to-br from-white via-transparent to-emerald-50 pointer-events-none" aria-hidden />
             <div className="relative rounded-2xl overflow-hidden border border-slate-200 shadow-xl transform-gpu" style={{ height: '520px' }}>
-              <MapContainer
-                center={[22.9734, 78.6569]}
-                zoom={5}
-                scrollWheelZoom={false}
-                className="w-full h-full leaflet-map"
-                style={{ backgroundColor: '#ffffff' }}
-              >
-                <TileLayer
-                  attribution='&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
-                  url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-                />
-                {indiaPins.map((pin) => (
-                  <Marker key={pin.city} position={pin.position} opacity={0.9}>
-                    <Popup>
-                      <div className="text-sm font-semibold text-slate-800">{pin.city}</div>
-                      <div className="text-xs text-slate-600">{pin.note}</div>
-                    </Popup>
-                  </Marker>
-                ))}
-              </MapContainer>
+              <Map location="India" />
             </div>
           </div>
         </div>
