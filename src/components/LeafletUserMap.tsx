@@ -35,7 +35,7 @@ const LeafletUserMap: React.FC = () => {
         (pos) => {
           setUserCoords([pos.coords.latitude, pos.coords.longitude]);
         },
-        (err) => {
+        (_err) => {
           setError('Location access denied or unavailable.');
         }
       );

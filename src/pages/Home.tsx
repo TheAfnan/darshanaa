@@ -31,7 +31,7 @@ L.Icon.Default.mergeOptions({
   shadowUrl: markerShadow,
 });
 
-const indiaPins: { city: string; note: string; position: [number, number] }[] = [
+const _indiaPins: { city: string; note: string; position: [number, number] }[] = [
   { city: 'Delhi', note: 'Capital · Heritage walks', position: [28.6139, 77.209] },
   { city: 'Lucknow', note: 'Kebabs · Tehzeeb', position: [26.8467, 80.9462] },
   { city: 'Varanasi', note: 'Ghats · Aarti', position: [25.3176, 82.9739] },

@@ -15,6 +15,8 @@ const Map: React.FC<{ location?: string }> = ({ location = 'India' }) => {
   const [mode, setMode] = useState<'standard' | 'streetview' | 'traffic'>('standard');
   const [showLocation, setShowLocation] = useState(false);
 
+  const [userCoords, setUserCoords] = useState<{ lat: number; lng: number } | null>(null);
+  
   const locationCoordinates: Record<string, { lat: number; lng: number }> = {
     'India': { lat: 20.5937, lng: 78.9629 },
     'Delhi': { lat: 28.6139, lng: 77.209 },
@@ -45,7 +47,6 @@ const Map: React.FC<{ location?: string }> = ({ location = 'India' }) => {
   }
 
   // User location
-  const [userCoords, setUserCoords] = useState<{ lat: number; lng: number } | null>(null);
   React.useEffect(() => {
     if (showLocation && navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(pos => {

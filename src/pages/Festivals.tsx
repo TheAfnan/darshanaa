@@ -1,8 +1,7 @@
-import domtoimage from 'dom-to-image';
 import { AnimatePresence, motion } from 'framer-motion';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
-import { Calendar, ChevronDown, ChevronRight, Clock, Download, Grid, Map as MapIcon, MapPin, Search, Share2, TrendingUp, X } from 'lucide-react';
+import { Calendar, ChevronDown, ChevronRight, Clock, Grid, Map as MapIcon, MapPin, Search, Share2, TrendingUp, X } from 'lucide-react';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import Map from '../components/Map';
 
@@ -606,29 +605,6 @@ const NextMonthHighlight = ({ festivalsData }: { festivalsData: FestivalDataType
   );
 };
 
-// --- Live Location Marker ---
-function LiveLocationMarker() {
-  const map = useMap();
-  const [pos, setPos] = useState<[number, number] | null>(null);
-
-  useEffect(() => {
-    navigator.geolocation.getCurrentPosition(({ coords }) => {
-      setPos([coords.latitude, coords.longitude]);
-      map.flyTo([coords.latitude, coords.longitude], 10);
-    });
-  }, [map]);
-
-  if (!pos) return null;
-  return (
-    <Marker position={pos}>
-      <Popup>
-        Your Live Location<br />
-        <span>{pos[0]}, {pos[1]}</span>
-      </Popup>
-    </Marker>
-  );
-}
-
 // --- MAIN COMPONENT ---
 const Festivals = () => {
   const [searchText, setSearchText] = useState('');
@@ -638,10 +614,8 @@ const Festivals = () => {
   const [showMore, setShowMore] = useState(false);
   const [showMap, setShowMap] = useState(false);
   const [selectedCard, setSelectedCard] = useState<CardType | null>(null);
-  const [hoveredCardId, setHoveredCardId] = useState<number | null>(null);
-  const [showLiveLocation, setShowLiveLocation] = useState(false);
+  const [showLiveLocation] = useState(false);
   const [isFilterOpen, setIsFilterOpen] = useState(false); // For the unified button dropdown
-  const mapRef = useRef<L.Map>(null);
   const cardsSectionRef = useRef<HTMLDivElement | null>(null);
 
   // Create cards for all types
@@ -684,11 +658,8 @@ const Festivals = () => {
 
   const showCards = showMore ? filteredCards : filteredCards.slice(0, 6);
   const highlightedCard = selectedCard || filteredCards[0];
-  const initialMapCenter: [number, number] = (highlightedCard && highlightedCard.lat && highlightedCard.lng
-    ? [highlightedCard.lat, highlightedCard.lng]
-    : [21, 78]) as [number, number];
 
-  useEffect(() => { setSelectedCard(null); setHoveredCardId(null); }, [showMap, filterType]);
+  useEffect(() => { setSelectedCard(null); }, [showMap, filterType]);
 
   const focusFestivals = () => {
     setFilterType('festival');
@@ -700,18 +671,7 @@ const Festivals = () => {
     });
   };
 
-  // --- MAP SNAPSHOT ---
-  function handleDownloadMap() {
-    const mapNode = document.querySelector('.leaflet-container');
-    if (!mapNode) return;
-    domtoimage.toPng(mapNode)
-      .then((dataUrl) => {
-        const link = document.createElement('a');
-        link.download = 'map.png';
-        link.href = dataUrl;
-        link.click();
-      });
-  }
+
 
   return (
     <div className="min-h-screen bg-stone-50 pb-20">
