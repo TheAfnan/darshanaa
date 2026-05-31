@@ -1,6 +1,7 @@
 import { GoogleAuthProvider, signInWithPopup } from "firebase/auth";
 import { ArrowRight, Lock, Mail, User, X } from "lucide-react";
 import React, { useEffect, useState } from "react";
+import PhoneAuth from "../components/PhoneAuth";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { auth } from "../firebase.config.ts";
@@ -30,6 +31,7 @@ const Login: React.FC<LoginProps> = ({ onClose, isModal = false }) => {
 
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [showPhoneAuth, setShowPhoneAuth] = useState(false);
 
   // Switch view based on URL
   useEffect(() => {
@@ -342,7 +344,22 @@ const Login: React.FC<LoginProps> = ({ onClose, isModal = false }) => {
                   />
                   Sign in with Google
                 </button>
+                
+                <div className="mt-3">
+                  <button
+                    type="button"
+                    onClick={() => setShowPhoneAuth((s) => !s)}
+                    className="w-full bg-white border border-gray-200 py-2.5 rounded-lg flex items-center justify-center gap-2 hover:bg-gray-50 text-sm"
+                  >
+                    Sign in with SMS (OTP)
+                  </button>
+                </div>
 
+                {showPhoneAuth && (
+                  <div className="mt-4">
+                    <PhoneAuth />
+                  </div>
+                )}
                 <p className="text-center text-[10px] mt-2">
                   Don’t have an account?{" "}
                   <button
